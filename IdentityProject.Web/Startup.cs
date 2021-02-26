@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using IdentityProject.Web.CustomValidation;
 using IdentityProject.Web.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -30,13 +31,36 @@ namespace IdentityProject.Web
             {
                 opts.UseSqlServer(Configuration["ConnectionStrings:DefaultConnectionString"]);
 
+                CookieBuilder cookieBuilder = new CookieBuilder();
+                cookieBuilder.Name = "MyBlog";
+                cookieBuilder.HttpOnly = false;
+                cookieBuilder.Expiration = System.TimeSpan.FromDays(30);
+                cookieBuilder.SameSite = SameSiteMode.Lax;
+                cookieBuilder.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+
+                services.ConfigureApplicationCookie(opts =>
+                {
+                    opts.LoginPath = new PathString("/Home/Login");
+                    opts.Cookie = cookieBuilder;
+                    opts.SlidingExpiration = true;
+                });
+
+
             });
 
             services.AddIdentity<AppUser, AppRole>(options =>
             {
-                options.Password.RequiredLength = 8;
+                options.User.RequireUniqueEmail= true;
+                options.User.AllowedUserNameCharacters =
+                    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._";
 
-            }).AddEntityFrameworkStores<AppIdentityDbContext>();
+                options.Password.RequiredLength = 8;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
+
+            }).AddPasswordValidator<CustomPasswordValidator>().AddUserValidator<CustomUserValidator>().AddEntityFrameworkStores<AppIdentityDbContext>();
 
             services.AddMvc(options => options.EnableEndpointRouting = false);
         }
