@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using IdentityProject.Web.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -31,9 +32,13 @@ namespace IdentityProject.Web
 
             });
 
-            services.AddIdentity<AppUser, AppRole>().AddEntityFrameworkStores<AppIdentityDbContext>();
-            
-            services.AddMvc();
+            services.AddIdentity<AppUser, AppRole>(options =>
+            {
+                options.Password.RequiredLength = 8;
+
+            }).AddEntityFrameworkStores<AppIdentityDbContext>();
+
+            services.AddMvc(options => options.EnableEndpointRouting = false);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
