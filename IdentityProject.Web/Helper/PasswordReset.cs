@@ -36,8 +36,6 @@ namespace IdentityProject.Web.Helper
             {
                 smtp.Send(message);
             }
-
-            
         }
     }
 }
