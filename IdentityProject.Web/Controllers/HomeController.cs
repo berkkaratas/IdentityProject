@@ -40,14 +40,21 @@ namespace IdentityProject.Web.Controllers
 
                 AppUser user = await _userManager.FindByEmailAsync(userLogin.Email);
 
-                if (user!=null)
+                if (user != null)
                 {
+                    if (await _userManager.IsLockedOutAsync(user))
+                    {
+                        ModelState.AddModelError("", "You tried too many incorrect entries, try later.");
+                        return View(userLogin);
+                    }
+
                     await _signInManager.SignOutAsync();
                     SignInResult result = await _signInManager.PasswordSignInAsync(user, userLogin.Password, userLogin.RememberMe, false);
 
                     if (result.Succeeded)
                     {
-                        if (TempData["ReturnUrl"]!=null)
+                        await _userManager.ResetAccessFailedCountAsync(user);
+                        if (TempData["ReturnUrl"] != null)
                         {
                             return Redirect(TempData["ReturnUrl"].ToString());
                         }
@@ -55,10 +62,29 @@ namespace IdentityProject.Web.Controllers
 
                         return RedirectToAction("Index", "Member");
                     }
+                    else
+                    {
+                        await _userManager.AccessFailedAsync(user);
+
+
+                        int fail = await _userManager.GetAccessFailedCountAsync(user);
+
+                        if (fail == 5)
+                        {
+                            await _userManager.SetLockoutEndDateAsync(user,
+                                  new DateTimeOffset(DateTime.Now.AddMinutes(30)));
+                            ModelState.AddModelError("", "You tried too many incorrect entries, try later.");
+                        }
+                        else
+                        {
+                            ModelState.AddModelError(nameof(LoginViewModel.Email), "Invalid email or password.");
+                        }
+
+                    }
                 }
                 else
                 {
-                    ModelState.AddModelError(nameof(LoginViewModel.Email),"Invalid email or password.");
+                    ModelState.AddModelError(nameof(LoginViewModel.Email), "Invalid user.");
                 }
             }
 
@@ -86,6 +112,7 @@ namespace IdentityProject.Web.Controllers
                 IdentityResult result = await _userManager.CreateAsync(user, userViewModel.Password);
                 if (result.Succeeded)
                 {
+
                     return RedirectToAction("LogIn");
                 }
                 else
