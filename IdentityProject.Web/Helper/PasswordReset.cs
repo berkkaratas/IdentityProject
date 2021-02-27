@@ -11,10 +11,10 @@ namespace IdentityProject.Web.Helper
     {
         public static void PasswordResetSendEmail(string link,string email,string userName)
         {
-            var fromAddress = new MailAddress("individual.berkelyum@gmail.com", "Berk Karataş");
+            var fromAddress = new MailAddress("***@gmail.com", "Berk Karataş");
             var toAddress = new MailAddress(email, userName);
-            const string fromPassword = "10100895420Berk!";
-            const string subject = "www.berkelyum.xyz::Reset Password";
+            const string fromPassword = "***!";
+            const string subject = "www.***::Reset Password";
             string body = $"<a href='{link}'>Reset Password Link</a>";
             
             var smtp = new SmtpClient
