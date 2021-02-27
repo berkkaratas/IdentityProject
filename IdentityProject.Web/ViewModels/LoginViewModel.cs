@@ -17,5 +17,8 @@ namespace IdentityProject.Web.ViewModels
         [DataType(DataType.Password)]
         [MinLength(8)]
         public string Password { get; set; }
+
+        public bool RememberMe { get; set; }
+
     }
 }

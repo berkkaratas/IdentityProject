@@ -25,8 +25,11 @@ namespace IdentityProject.Web.Controllers
             return View();
         }
 
-        public IActionResult LogIn()
+        public IActionResult LogIn(string returnUrl)
         {
+
+            TempData["ReturnUrl"] = returnUrl;
+
             return View();
         }
         [HttpPost]
@@ -40,10 +43,16 @@ namespace IdentityProject.Web.Controllers
                 if (user!=null)
                 {
                     await _signInManager.SignOutAsync();
-                    SignInResult result = await _signInManager.PasswordSignInAsync(user, userLogin.Password, false, false);
+                    SignInResult result = await _signInManager.PasswordSignInAsync(user, userLogin.Password, userLogin.RememberMe, false);
 
                     if (result.Succeeded)
                     {
+                        if (TempData["ReturnUrl"]!=null)
+                        {
+                            return Redirect(TempData["ReturnUrl"].ToString());
+                        }
+
+
                         return RedirectToAction("Index", "Member");
                     }
                 }
@@ -55,7 +64,7 @@ namespace IdentityProject.Web.Controllers
 
 
 
-            return View();
+            return View(userLogin);
         }
 
 
