@@ -20,10 +20,14 @@
                 <input asp-for="Password" class="form-control" />
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
+
             <div class="form-group">
-                <input type="checkbox" asp-for="RememberMe"/> Remember Me.
+                <input type="checkbox" asp-for="RememberMe" /> Remember Me.
             </div>
             <div class="form-group">
+                <a asp-action="ResetPassword" class="">Forget my password.</a>
+            </div>
+            <div class="form-group text-center">
                 <input type="submit" value="Log In" class="btn btn-primary" />
             </div>
         </form>
@@ -31,6 +35,6 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Back to Home</a>
 </div>
 
