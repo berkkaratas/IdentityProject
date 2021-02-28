@@ -17,7 +17,7 @@
             <h4>UserViewModel</h4>
             <hr />
 
-            <form asp-action="ProfileEdit">
+            <form asp-action="ProfileEdit" method="post" enctype="multipart/form-data">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-group">
                     <label asp-for="UserName" class="control-label"></label>
@@ -33,6 +33,10 @@
                     <label asp-for="Email" class="control-label"></label>
                     <input asp-for="Email" class="form-control" />
                     <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label class="control-label">Profile Photo</label>
+                    <input type="file" name="userPicture" class="form-control" />
                 </div>
                 <div class="form-group text-center">
                     <input type="submit" value="Update" class="btn btn-primary" />

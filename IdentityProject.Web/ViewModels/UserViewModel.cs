@@ -25,5 +25,8 @@ namespace IdentityProject.Web.ViewModels
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
+        public string Picture { get; set; }
+
+
     }
 }

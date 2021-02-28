@@ -1,12 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using IdentityProject.Web.Models;
 using IdentityProject.Web.ViewModels;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 
 namespace IdentityProject.Web.Controllers
@@ -40,7 +42,7 @@ namespace IdentityProject.Web.Controllers
             return View(model);
         }
         [HttpPost]
-        public async Task<IActionResult> ProfileEdit(UserViewModel model)
+        public async Task<IActionResult> ProfileEdit(UserViewModel model, IFormFile userPicture)
         {
             ModelState.Remove("Password");
 
@@ -48,6 +50,16 @@ namespace IdentityProject.Web.Controllers
             {
                 AppUser user = await _userManager.FindByNameAsync(User.Identity.Name);
 
+
+                if (userPicture != null && userPicture.Length > 0)
+                {
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(userPicture.FileName);
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/UserPicture", fileName);
+
+                    await using var stream = new FileStream(path, FileMode.Create);
+                    await userPicture.CopyToAsync(stream);
+                    user.Picture = "/UserPicture/" + fileName;
+                }
                 user.UserName = model.UserName;
                 user.Email = model.Email;
                 user.PhoneNumber = model.PhoneNumber;
@@ -59,13 +71,13 @@ namespace IdentityProject.Web.Controllers
                     await _userManager.UpdateSecurityStampAsync(user);
 
                     await _signInManager.SignOutAsync();
-                    await _signInManager.SignInAsync(user,true);
+                    await _signInManager.SignInAsync(user, true);
                     ViewBag.success = "true";
                 }
                 else
                 {
                     foreach (var error in result.Errors)
-                    { 
+                    {
                         ModelState.AddModelError("", error.Description);
                     }
                 }

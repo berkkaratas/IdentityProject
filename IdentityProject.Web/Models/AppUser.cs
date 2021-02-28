@@ -6,7 +6,9 @@ using Microsoft.AspNetCore.Identity;
 
 namespace IdentityProject.Web.Models
 {
-    public class AppUser:IdentityUser
+    public class AppUser : IdentityUser
     {
+        public string Picture { get; set; }
+
     }
 }
