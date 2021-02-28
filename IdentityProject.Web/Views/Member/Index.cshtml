@@ -1,7 +1,29 @@
-﻿
+﻿@model UserViewModel
 @{
     ViewData["Title"] = "Index";
+    Layout = "_MemberLayout";
 }
 
-<h1>Index</h1>
+<h3 class="text-center">Profile</h3>
+<div class="row">
+    <div class="col-sm-3">
+        <img src="~/UserPicture/profile.png" style="height: 100%; width: 100%;" class="rounded" alt=""/>
+    </div>
+    <div class="col-sm-9">
+        <table class="table table-bordered table-striped">
+            <tr>
+                <th>UserName</th>
+                <td>@Model.UserName</td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td>@Model.Email</td>
+            </tr>
+            <tr>
+                <th>Phone Number</th>
+                <td>@Model.PhoneNumber</td>
+            </tr>
+        </table>
+    </div>
 
+</div>
