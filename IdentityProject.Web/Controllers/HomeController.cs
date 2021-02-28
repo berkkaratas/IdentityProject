@@ -10,15 +10,9 @@ using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace IdentityProject.Web.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
-        private UserManager<AppUser> _userManager;
-        private SignInManager<AppUser> _signInManager;
-        public HomeController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
-        {
-            _userManager = userManager;
-            _signInManager = signInManager;
-        }
+        public HomeController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager):base(userManager,signInManager){}
 
         public IActionResult Index()
         {
@@ -123,11 +117,7 @@ namespace IdentityProject.Web.Controllers
                 }
                 else
                 {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError("", error.Description);
-
-                    }
+                    AddModelError(result);
                 }
             }
 
@@ -198,10 +188,7 @@ namespace IdentityProject.Web.Controllers
                 }
                 else
                 {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError("",error.Description);
-                    }
+                    AddModelError(result);
                 }
             }
             else

@@ -13,15 +13,9 @@ using Microsoft.AspNetCore.Identity;
 
 namespace IdentityProject.Web.Controllers
 {
-    public class MemberController : Controller
+    public class MemberController : BaseController
     {
-        private UserManager<AppUser> _userManager;
-        private SignInManager<AppUser> _signInManager;
-        public MemberController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
-        {
-            _userManager = userManager;
-            _signInManager = signInManager;
-        }
+        public MemberController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager):base(userManager,signInManager){}
         [Authorize]
         public IActionResult Index()
         {
@@ -35,7 +29,7 @@ namespace IdentityProject.Web.Controllers
 
         public IActionResult ProfileEdit()
         {
-            AppUser user = _userManager.FindByNameAsync(User.Identity.Name).Result;
+            AppUser user = CurrentUser;
 
             UserViewModel model = user.Adapt<UserViewModel>();
 
@@ -48,7 +42,7 @@ namespace IdentityProject.Web.Controllers
 
             if (ModelState.IsValid)
             {
-                AppUser user = await _userManager.FindByNameAsync(User.Identity.Name);
+                AppUser user = CurrentUser;
 
 
                 if (userPicture != null && userPicture.Length > 0)
@@ -76,10 +70,7 @@ namespace IdentityProject.Web.Controllers
                 }
                 else
                 {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError("", error.Description);
-                    }
+                    AddModelError(result);
                 }
 
 
@@ -99,7 +90,7 @@ namespace IdentityProject.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                AppUser user = _userManager.FindByNameAsync(User.Identity.Name).Result;
+                AppUser user = CurrentUser;
 
                 if (user != null)
                 {
@@ -118,10 +109,7 @@ namespace IdentityProject.Web.Controllers
                         }
                         else
                         {
-                            foreach (var error in result.Errors)
-                            {
-                                ModelState.AddModelError("", error.Description);
-                            }
+                            AddModelError(result);
                         }
 
                     }
