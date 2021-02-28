@@ -58,11 +58,13 @@ namespace IdentityProject.Web
             cookieBuilder.SecurePolicy = CookieSecurePolicy.SameAsRequest;
             services.ConfigureApplicationCookie(opts =>
             {
-                opts.ExpireTimeSpan = System.TimeSpan.FromDays(60);
                 opts.LoginPath = new PathString("/Home/Login");
                 opts.LogoutPath = new PathString("/Member/LogOut");
+                opts.AccessDeniedPath = new PathString("/Member/AccessDenied");
                 opts.Cookie = cookieBuilder;
                 opts.SlidingExpiration = true;
+                opts.ExpireTimeSpan = TimeSpan.FromDays(60);
+
             });
 
         }
