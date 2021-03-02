@@ -99,6 +99,8 @@ namespace IdentityProject.Web.Controllers
                 IdentityResult result = await _userManager.CreateAsync(user, userViewModel.Password);
                 if (result.Succeeded)
                 {
+
+                    
                     string confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     string link = Url.Action("ConfirmEmail", "Home", new
                     {

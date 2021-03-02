@@ -31,9 +31,11 @@ namespace IdentityProject.Web
         {
             services.AddDbContext<AppIdentityDbContext>(opts =>
             {
-                opts.UseSqlServer(Configuration["ConnectionStrings:DefaultConnectionString"]);
+                //opts.UseSqlServer(Configuration["ConnectionStrings:DefaultConnectionString"]);
+                opts.UseSqlServer(Configuration["ConnectionStrings:DefaultAzureConnectionString"]);
             });
 
+            
             services.AddScoped<IClaimsTransformation, ClaimProvider>();
             services.AddIdentity<AppUser, AppRole>(options =>
                 {
@@ -51,6 +53,8 @@ namespace IdentityProject.Web
                 .AddEntityFrameworkStores<AppIdentityDbContext>().AddDefaultTokenProviders();
 
             services.AddMvc(options => options.EnableEndpointRouting = false);
+
+
 
             CookieBuilder cookieBuilder = new CookieBuilder();
 
