@@ -143,8 +143,6 @@ namespace IdentityProject.Web.Controllers
                     token = passwordResetToken
                 },HttpContext.Request.Scheme);
 
-
-
                 Helper.PasswordReset.PasswordResetSendEmail(passwordResetLink,user.Email,user.UserName);
                 ViewBag.status = "success";
             }
@@ -152,10 +150,7 @@ namespace IdentityProject.Web.Controllers
             {
                 ModelState.AddModelError("","Invalid Email");
             }
-
-
-
-
+            
             return View(reset);
         }
 

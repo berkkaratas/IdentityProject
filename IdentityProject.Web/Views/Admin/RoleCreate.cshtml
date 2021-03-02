@@ -1,0 +1,28 @@
+﻿@model IdentityProject.Web.ViewModels.RoleViewModel
+
+@{
+    ViewData["Title"] = "RoleCreate";
+    Layout = "~/Views/Admin/_AdminLayout.cshtml";
+}
+
+
+
+<div class="row">
+    <div class="col-md-4 offset-md-4">
+        <h4>Create Role</h4>
+        <hr />
+        <form asp-action="RoleCreate">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control"/>
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group text-center">
+                <input type="submit" value="Create Role" class="btn btn-primary"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+

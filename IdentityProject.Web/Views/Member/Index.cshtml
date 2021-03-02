@@ -21,7 +21,16 @@
             </tr>
             <tr>
                 <th>Phone Number</th>
-                <td>@Model.PhoneNumber</td>
+                <td>@if (!String.IsNullOrEmpty(Model.PhoneNumber))
+                    {
+                        @Model.PhoneNumber
+                    }
+                    else
+                    {
+                        <span>None</span>
+                    }
+                    
+                </td>
             </tr>
         </table>
     </div>
