@@ -13,7 +13,6 @@ namespace IdentityProject.Web.Controllers
     public class HomeController : BaseController
     {
         public HomeController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager):base(userManager,signInManager){}
-
         public IActionResult Index()
         {
             if (User.Identity.IsAuthenticated)
@@ -23,8 +22,6 @@ namespace IdentityProject.Web.Controllers
 
             return View();
         }
-
-
         public IActionResult LogIn(string returnUrl)
         {
 
@@ -37,9 +34,7 @@ namespace IdentityProject.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-
                 AppUser user = await _userManager.FindByEmailAsync(userLogin.Email);
-
                 if (user != null)
                 {
                     if (await _userManager.IsLockedOutAsync(user))
@@ -47,10 +42,13 @@ namespace IdentityProject.Web.Controllers
                         ModelState.AddModelError("", "You tried too many incorrect entries, try later.");
                         return View(userLogin);
                     }
-
+                    if (_userManager.IsEmailConfirmedAsync(user).Result ==false)
+                    {
+                        ModelState.AddModelError("", "Your email address is not verified. Please see your e-mail.");
+                        return View(userLogin);
+                    }
                     await _signInManager.SignOutAsync();
                     SignInResult result = await _signInManager.PasswordSignInAsync(user, userLogin.Password, userLogin.RememberMe, false);
-
                     if (result.Succeeded)
                     {
                         await _userManager.ResetAccessFailedCountAsync(user);
@@ -59,27 +57,21 @@ namespace IdentityProject.Web.Controllers
                             return Redirect(TempData["ReturnUrl"].ToString());
                         }
 
-
                         return RedirectToAction("Index", "Member");
                     }
                     else
                     {
                         await _userManager.AccessFailedAsync(user);
-
-
                         int fail = await _userManager.GetAccessFailedCountAsync(user);
-
                         if (fail == 5)
                         {
-                            await _userManager.SetLockoutEndDateAsync(user,
-                                  new DateTimeOffset(DateTime.Now.AddMinutes(30)));
+                            await _userManager.SetLockoutEndDateAsync(user, new DateTimeOffset(DateTime.Now.AddMinutes(30)));
                             ModelState.AddModelError("", "You tried too many incorrect entries, try later.");
                         }
                         else
                         {
                             ModelState.AddModelError(nameof(LoginViewModel.Email), "Invalid email or password.");
                         }
-
                     }
                 }
                 else
@@ -87,13 +79,8 @@ namespace IdentityProject.Web.Controllers
                     ModelState.AddModelError(nameof(LoginViewModel.Email), "Invalid user.");
                 }
             }
-
-
-
             return View(userLogin);
         }
-
-
         [HttpGet]
         public IActionResult SignUp()
         {
@@ -112,6 +99,15 @@ namespace IdentityProject.Web.Controllers
                 IdentityResult result = await _userManager.CreateAsync(user, userViewModel.Password);
                 if (result.Succeeded)
                 {
+                    string confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    string link = Url.Action("ConfirmEmail", "Home", new
+                    {
+                        userId = user.Id,
+                        token = confirmationToken
+
+                    },protocol:HttpContext.Request.Scheme);
+
+                    Helper.EmailConfirmation.EmailConfirmationEmail(link, user.Email, user.UserName);
 
                     return RedirectToAction("LogIn");
                 }
@@ -120,11 +116,8 @@ namespace IdentityProject.Web.Controllers
                     AddModelError(result);
                 }
             }
-
-
             return View(userViewModel);
         }
-
         public IActionResult ResetPassword()
         {
             return View();
@@ -153,14 +146,12 @@ namespace IdentityProject.Web.Controllers
             
             return View(reset);
         }
-
         public IActionResult ResetPasswordConfirm(string userId, string token)
         {
             TempData["userId"] = userId;
             TempData["token"] = token;
             return View();
         }
-
         [HttpPost]
         public async Task<IActionResult> ResetPasswordConfirm([Bind("PasswordNew")]PasswordResetViewModel passwordResetViewModel)
         {
@@ -193,6 +184,24 @@ namespace IdentityProject.Web.Controllers
 
 
             return View(passwordResetViewModel);
+        }
+
+        public async Task<IActionResult> ConfirmEmail(string userid, string token)
+        {
+            var user = await _userManager.FindByIdAsync(userid);
+
+            IdentityResult result = await _userManager.ConfirmEmailAsync(user,token);
+
+            if (result.Succeeded)
+            {
+                ViewBag.status = "Email confirmation successfully. Please login";
+            }
+            else
+            {
+                ViewBag.status = "Something went wrong. Try again.";
+            }
+
+            return View();
         }
     }
 }
